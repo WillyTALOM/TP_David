@@ -11,7 +11,6 @@
         <tr>
             <th>N°</th>
             <th>Nom</th>
-            <th>Produits</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -19,11 +18,10 @@
         {% for category in categories|reverse %}
             <tr>
                 <td>{{ loop.revindex }}</td>
-                <td><a href={#"{{ lien produits de caque category"#} class="btn btn-success">Voir les produits</a>Voir les produits</td>
                 <td>{{category.name}}</td>
                 <td>
-                    {#<a href="{{ path('product_update', {'id': product.id}) }}"><i class="bi bi-pencil-square text-primary"></i></a>
-                        <a href="{{ path('product_delete', {'id': product.id}) }}"><i class="bi bi-trash3 text-danger"></i></a>#}"
+                    <a href="{{ path('category_update', {'id': category.id}) }}"><i class="bi bi-pencil-square text-primary"></i></a>
+                        <a href="{{ path('category_delete', {'id': category.id}) }}"><i class="bi bi-trash3 text-danger"></i></a>"
                 </td>
             </tr>
         {% endfor %}
@@ -32,7 +30,7 @@
 
 
 <div class="text-end mt-4">
-    <a href="{{ path('create_category') }}" class="btn btn-success">Ajouter une catégorie</a>
+    <a href="{{ path('create_category') }}" class="btn btn-success">Créér une catégorie</a>
 </div>
 
 {% endblock %}

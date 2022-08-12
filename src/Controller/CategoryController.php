@@ -55,4 +55,45 @@ class CategoryController extends AbstractController
         ]);
 
     }
+
+    #[Route('/admin/category/update/{id}', name: 'category_update')]
+    public function update(Category $category,CategoryRepository $categoryRepository, Request $request, ManagerRegistry $managerRegistry): Response
+    {
+        $form = $this->createForm(CategoryType::class,
+        $category);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+            $categories =  $categoryRepository->findAll();
+            $categoryName = [];
+
+            foreach ($categories as $categorie){
+
+                $categoryName[] = $categorie->getName();
+            }
+
+            $slugger = new AsciiSlugger();
+            $categorie->setSlug(strtolower($slugger->slug($form['name']->getData())));
+
+            $manager = $managerRegistry->getManager();
+            $manager->persist($category);
+            $manager->flush();
+        }
+
+        return $this->render('category/form.html.twig', [
+            'categoryForm' => $form->createView()
+        ]);
+    }
+
+    #[Route('/admin/category/delete/{id}', name: 'category_delete')]
+    public function delete(Category $category, ManagerRegistry $managerRegistry): Response
+    {
+        $manager = $managerRegistry->getManager();
+        $manager->remove($category);
+        $manager->flush();
+        return $this->redirectToRoute('admin_category');
+
+    }
+
 }

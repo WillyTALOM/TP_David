@@ -39,10 +39,14 @@ class CategoryController extends AbstractController
                 $categoryNames [] = $categorie->getName();
             }
 
-            $img = $form['img']->getDataa();
-            $extensionImg = $img->guessExtention();
+            $img = $form['img']->getData();
+            if ($img === null) {
+                $this->addFlash('danger', 'Pas d\'image trouvée');
+                return $this->redirectToRoute('admin_category');
+            }
+            $extensionImg = $img->guessExtension();
             $nomImg = time() . '-1.'.$extensionImg;
-            $img->move($this->getParameter('product_image_dir'), $nomImg);
+            $img->move($this->getParameter('category_image_dir'), $nomImg);
 
             $category->setImg($nomImg);
 
@@ -84,7 +88,7 @@ class CategoryController extends AbstractController
 
             if ($img !== null) {
                 $oldImg = $category->getImg();
-                $oldImgPath = $this->getParameter('product_image_dir') . '/' . $$oldImg;
+                $oldImgPath = $this->getParameter('category_image_dir') . '/' . $$oldImg;
 
                 if (file_exists($oldImgPath)) {
                     unlink($oldImgPath);
@@ -92,7 +96,7 @@ class CategoryController extends AbstractController
 
                 $extensionImg = $img->guessExtension(); 
                 $nomImg = time() . '-1.'.$extensionImg;
-                $img->move($this->getParameter('product_image_dir'), $nomImg);
+                $img->move($this->getParameter('category_image_dir'), $nomImg);
                 $category->setImg($nomImg);
 
             $slugger = new AsciiSlugger();
@@ -113,7 +117,7 @@ class CategoryController extends AbstractController
     #[Route('/admin/category/delete/{id}', name: 'category_delete')]
     public function delete(Category $category, ManagerRegistry $managerRegistry): Response
     {
-        $imgpath = $this->getParameter('product_image_dir') . '/' . $category->getImg();
+        $imgpath = $this->getParameter('category_image_dir') . '/' . $category->getImg();
         if (file_exists($imgpath)) {
             unlink($imgpath);
         }

@@ -39,6 +39,13 @@ class CategoryController extends AbstractController
                 $categoryNames [] = $categorie->getName();
             }
 
+            $img = $form['img']->getDataa();
+            $extensionImg = $img->guessExtention();
+            $nomImg = time() . '-1.'.$extensionImg;
+            $img->move($this->getParameter('product_image_dir'), $nomImg);
+
+            $category->setImg($nomImg);
+
             $slugger = new AsciiSlugger();
             $category->setSlug(strtolower($slugger->slug($form['name']->getData())));
 
@@ -73,22 +80,44 @@ class CategoryController extends AbstractController
                 $categoryName[] = $categorie->getName();
             }
 
+            $img = $form['img']->getData();
+
+            if ($img !== null) {
+                $oldImg = $category->getImg();
+                $oldImgPath = $this->getParameter('product_image_dir') . '/' . $$oldImg;
+
+                if (file_exists($oldImgPath)) {
+                    unlink($oldImgPath);
+                }
+
+                $extensionImg = $img->guessExtension(); 
+                $nomImg = time() . '-1.'.$extensionImg;
+                $img->move($this->getParameter('product_image_dir'), $nomImg);
+                $category->setImg($nomImg);
+
             $slugger = new AsciiSlugger();
             $categorie->setSlug(strtolower($slugger->slug($form['name']->getData())));
 
             $manager = $managerRegistry->getManager();
             $manager->persist($category);
             $manager->flush();
-        }
+            }
 
         return $this->render('category/form.html.twig', [
             'categoryForm' => $form->createView()
         ]);
-    }
+    
+        }
+    }    
 
     #[Route('/admin/category/delete/{id}', name: 'category_delete')]
     public function delete(Category $category, ManagerRegistry $managerRegistry): Response
     {
+        $imgpath = $this->getParameter('product_image_dir') . '/' . $category->getImg();
+        if (file_exists($imgpath)) {
+            unlink($imgpath);
+        }
+       
         $manager = $managerRegistry->getManager();
         $manager->remove($category);
         $manager->flush();
